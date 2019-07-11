@@ -43,6 +43,7 @@ void gpr_log(const char* file, int line, gpr_log_severity severity,
   va_list args;
   int ret;
 
+  // TODO(Jan) Verwende gpr_asprintf aus string_windows.cc?
   /* Determine the length. */
   va_start(args, format);
   ret = _vscprintf(format, args);
@@ -56,7 +57,11 @@ void gpr_log(const char* file, int line, gpr_log_severity severity,
 
     /* Print to the buffer. */
     va_start(args, format);
+#if !defined(GPR_BACKWARDS_COMPATIBILITY_MODE) || _WIN32_WINNT >= 0x0600
     ret = vsnprintf_s(message, strp_buflen, _TRUNCATE, format, args);
+#else
+    ret = vsnprintf(message, strp_buflen, format, args);
+#endif
     va_end(args);
     if ((size_t)ret != strp_buflen - 1) {
       /* This should never happen. */

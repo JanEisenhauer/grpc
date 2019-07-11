@@ -49,7 +49,11 @@ static gpr_timespec now_impl(gpr_clock_type clock) {
   now_tv.clock_type = clock;
   switch (clock) {
     case GPR_CLOCK_REALTIME:
+#if !defined(GPR_BACKWARDS_COMPATIBILITY_MODE) || _WIN32_WINNT >= 0x0600
       _ftime_s(&now_tb);
+#else
+      _ftime(&now_tb);
+#endif
       now_tv.tv_sec = (int64_t)now_tb.time;
       now_tv.tv_nsec = now_tb.millitm * 1000000;
       break;

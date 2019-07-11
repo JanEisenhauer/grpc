@@ -55,7 +55,11 @@ FILE* gpr_tmpfile(const char* prefix, char** tmp_filename_out) {
   if (!success) goto end;
 
   /* Open a file there. */
+#if !defined(GPR_BACKWARDS_COMPATIBILITY_MODE) || _WIN32_WINNT >= 0x0600
   if (_tfopen_s(&result, tmp_filename, TEXT("wb+")) != 0) goto end;
+#else
+  if ((result = _tfopen(tmp_filename, TEXT("wb+"))) == NULL) goto end;
+#endif
 
 end:
   if (result && tmp_filename_out) {

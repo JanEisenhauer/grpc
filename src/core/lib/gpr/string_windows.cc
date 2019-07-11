@@ -54,7 +54,11 @@ int gpr_asprintf(char** strp, const char* format, ...) {
 
   /* Print to the buffer. */
   va_start(args, format);
+#if !defined(GPR_BACKWARDS_COMPATIBILITY_MODE) || _WIN32_WINNT >= 0x0600
   ret = vsnprintf_s(*strp, strp_buflen, _TRUNCATE, format, args);
+#else
+  ret = vsnprintf(*strp, strp_buflen, format, args);
+#endif
   va_end(args);
   if ((size_t)ret == strp_buflen - 1) {
     return ret;
