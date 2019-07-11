@@ -22,6 +22,8 @@
 
 #include "src/core/tsi/ssl_transport_security.h"
 
+#include "src/core/lib/iomgr/socket_utils.h"
+
 #include <limits.h>
 #include <string.h>
 
@@ -386,7 +388,7 @@ static tsi_result add_subject_alt_names_properties_to_peer(
         result = TSI_INTERNAL_ERROR;
         break;
       }
-      const char* name = inet_ntop(af, subject_alt_name->d.iPAddress->data,
+      const char* name = grpc_inet_ntop(af, subject_alt_name->d.iPAddress->data,
                                    ntop_buf, INET6_ADDRSTRLEN);
       if (name == nullptr) {
         gpr_log(GPR_ERROR, "Could not get IP string from asn1 octet.");

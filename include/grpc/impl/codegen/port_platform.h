@@ -47,6 +47,17 @@
 #define NOMINMAX
 #endif /* NOMINMAX */
 
+#ifdef GPR_BACKWARDS_COMPATIBILITY_MODE
+#ifndef _WIN32_WINNT
+#error \
+    "Please compile grpc with _WIN32_WINNT of at least 0x502 (aka Windows XP SP2)"
+#else /* !defined(_WIN32_WINNT) */
+#if (_WIN32_WINNT < 0x0502)
+#error \
+    "Please compile grpc with _WIN32_WINNT of at least 0x502 (aka Windows XP SP2)"
+#endif /* _WIN32_WINNT < 0x0502 */
+#endif /* defined(_WIN32_WINNT) */
+#else /* defined(GPR_BACKWARDS_COMPATIBILITY_MODE) */
 #ifndef _WIN32_WINNT
 #error \
     "Please compile grpc with _WIN32_WINNT of at least 0x600 (aka Windows Vista)"
@@ -56,6 +67,7 @@
     "Please compile grpc with _WIN32_WINNT of at least 0x600 (aka Windows Vista)"
 #endif /* _WIN32_WINNT < 0x0600 */
 #endif /* defined(_WIN32_WINNT) */
+#endif /* !defined(GPR_BACKWARDS_COMPATIBILITY_MODE) */
 
 #include <windows.h>
 
