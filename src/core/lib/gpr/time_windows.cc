@@ -43,7 +43,11 @@ void gpr_time_init(void) {
 static gpr_timespec now_impl(gpr_clock_type clock) {
   gpr_timespec now_tv;
   LONGLONG diff;
+#if !defined(GPR_BACKWARDS_COMPATIBILITY_MODE) || _WIN32_WINNT >= 0x0600
   struct _timeb now_tb;
+#else
+  struct __timeb64 now_tb;
+#endif
   LARGE_INTEGER timestamp;
   double now_dbl;
   now_tv.clock_type = clock;
@@ -52,7 +56,7 @@ static gpr_timespec now_impl(gpr_clock_type clock) {
 #if !defined(GPR_BACKWARDS_COMPATIBILITY_MODE) || _WIN32_WINNT >= 0x0600
       _ftime_s(&now_tb);
 #else
-      _ftime(&now_tb);
+      _ftime64(&now_tb);
 #endif
       now_tv.tv_sec = (int64_t)now_tb.time;
       now_tv.tv_nsec = now_tb.millitm * 1000000;
