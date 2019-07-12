@@ -21,6 +21,7 @@
 #include <grpc/support/port_platform.h>
 
 #ifdef GPR_WINDOWS
+#if !defined(GPR_BACKWARDS_COMPATIBILITY_MODE) || _WIN32_WINNT >= 0x0600
 
 #include <grpc/support/log.h>
 #include <grpc/support/sync.h>
@@ -115,4 +116,9 @@ void gpr_once_init(gpr_once* once, void (*init_function)(void)) {
   InitOnceExecuteOnce(once, run_once_func, &arg, &dummy);
 }
 
+#else /* GPR_BACKWARDS_COMPATIBILITY_MODE */
+/* Use pthreads, for example the winpthreads implementation from mingw-w64 */
+#define GPR_POSIX_SYNC 1
+#include "sync_posix.cc"
+#endif /* GPR_BACKWARDS_COMPATIBILITY_MODE */
 #endif /* GPR_WINDOWS */
