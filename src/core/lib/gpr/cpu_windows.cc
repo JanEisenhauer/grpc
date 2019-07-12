@@ -22,6 +22,8 @@
 #include <grpc/support/cpu.h>
 #include <grpc/support/log.h>
 
+#if !defined(GPR_BACKWARDS_COMPATIBILITY_MODE) || _WIN32_WINNT >= 0x0600
+
 unsigned gpr_cpu_num_cores(void) {
   SYSTEM_INFO si;
   GetSystemInfo(&si);
@@ -29,5 +31,20 @@ unsigned gpr_cpu_num_cores(void) {
 }
 
 unsigned gpr_cpu_current_cpu(void) { return GetCurrentProcessorNumber(); }
+
+#else /* GPR_BACKWARDS_COMPATIBILITY_MODE */
+
+#include <pthread.h>
+
+unsigned gpr_cpu_num_cores(void) {
+  return pthread_num_processors_np();
+}
+
+unsigned gpr_cpu_current_cpu(void) { 
+  // TODO(Jan) cpu_posix.cc hat eine nicht ganz so naive Implementierung ueber pthreads.
+  return 0;
+}
+
+#endif /* GPR_BACKWARDS_COMPATIBILITY_MODE */
 
 #endif /* GPR_WINDOWS */
